@@ -66,6 +66,10 @@ Obsidian uses `![[image.png]]` for image embeds. VitePress only supports standar
 
 The `scripts/convert-obsidian-images.sh` script handles this conversion automatically.
 
-### 5. Home page has no sidebar
+### 5. Gitignore `.vitepress/cache` and `.vitepress/dist`
+
+`.vitepress/cache` and `.vitepress/dist` should be added to `.gitignore`. The config file (`config.ts`) must remain tracked.
+
+### 6. Home page has no sidebar
 
 VitePress's `layout: home` does not render the sidebar. The sidebar only appears on `layout: doc` pages. Add hero action buttons and a top nav bar to provide navigation.
