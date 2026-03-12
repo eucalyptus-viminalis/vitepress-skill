@@ -20,20 +20,20 @@ fi
 
 count=0
 
-find "$TARGET_DIR" -name '*.md' \
-  -not -path '*/.vitepress/*' \
-  -not -path '*/node_modules/*' \
-  -not -path '*/.git/*' | while read -r file; do
+while IFS= read -r file; do
   if grep -q '!\[\[.*\]\]' "$file"; then
     # ![[path/image.png|alt text]] → ![alt text](./path/image.png)
     # ![[path/image.png]]          → ![image.png](./path/image.png)
     sed -E '
       s/!\[\[([^]|]+)\|([^]]+)\]\]/![\2](.\/\1)/g
-      s/!\[\[([^]]+)\]\]/![\1](.\/\1)/g
+      s/!\[\[([^]/]+\/)*([^]]+)\]\]/![\2](.\/\1\2)/g
     ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
     echo "converted: $file"
     count=$((count + 1))
   fi
-done
+done < <(find "$TARGET_DIR" -name '*.md' \
+  -not -path '*/.vitepress/*' \
+  -not -path '*/node_modules/*' \
+  -not -path '*/.git/*')
 
-echo "done"
+echo "done. $count file(s) converted."
