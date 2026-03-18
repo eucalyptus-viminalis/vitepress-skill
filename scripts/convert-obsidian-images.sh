@@ -3,7 +3,9 @@
 #
 #   ![[image.png]]           → ![image.png](./image.png)
 #   ![[image.png|alt text]]  → ![alt text](./image.png)
+#   ![[image.png|300]]       → ![image.png](./image.png)  (resize syntax stripped)
 #   ![[subdir/image.png]]    → ![image.png](./subdir/image.png)
+#   ![[note#heading]]        → skipped (not an image embed)
 #
 # Usage:
 #   ./convert-obsidian-images.sh [directory]
@@ -22,11 +24,19 @@ count=0
 
 while IFS= read -r file; do
   if grep -q '!\[\[.*\]\]' "$file"; then
-    # ![[path/image.png|alt text]] → ![alt text](./path/image.png)
-    # ![[path/image.png]]          → ![image.png](./path/image.png)
     sed -E '
-      s/!\[\[([^]|]+)\|([^]]+)\]\]/![\2](.\/\1)/g
-      s/!\[\[([^]/]+\/)*([^]]+)\]\]/![\2](.\/\1\2)/g
+      # Skip non-image embeds like ![[note#heading]] — only process lines with image extensions
+      /!\[\[[^]]*\.(png|jpg|jpeg|gif|svg|webp|bmp|ico)/I {
+
+        # ![[path/image.ext|digits]] → strip resize syntax (Obsidian width specifier)
+        s/!\[\[([^]|]+\.(png|jpg|jpeg|gif|svg|webp|bmp|ico))\|[0-9]+\]\]/![[\1]]/gI
+
+        # ![[path/image.ext|alt text]] → ![alt text](./path/image.ext)
+        s/!\[\[([^]|]+\.(png|jpg|jpeg|gif|svg|webp|bmp|ico))\|([^]]+)\]\]/![\3](.\/\1)/gI
+
+        # ![[subdir/image.ext]] → ![image.ext](./subdir/image.ext)
+        s/!\[\[([^]|]+\/)*([^]|]+\.(png|jpg|jpeg|gif|svg|webp|bmp|ico))\]\]/![\2](.\/\1\2)/gI
+      }
     ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
     echo "converted: $file"
     count=$((count + 1))
