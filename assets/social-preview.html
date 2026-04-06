@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: #1b1b1f;
+      color: #fff;
+    }
+
+    .canvas {
+      width: 1200px;
+      height: 630px;
+      padding: 60px 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Radial glow from top-right */
+    .glow {
+      position: absolute;
+      top: -160px;
+      right: -160px;
+      width: 640px;
+      height: 640px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(65, 209, 170, 0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* Faint decorative grid lines */
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(65, 209, 170, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(65, 209, 170, 0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ── Top row ── */
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pip {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #41d1aa;
+    }
+
+    .label {
+      font-size: 26px;
+      font-weight: 600;
+      color: #41d1aa;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Main content ── */
+    .main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .headline {
+      font-size: 92px;
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: #fff;
+    }
+
+    .headline .anywhere {
+      color: #41d1aa;
+    }
+
+    /* Agent prompt input — Claude Code style */
+    .command {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 32px;
+      padding: 18px 28px;
+      background: rgba(255, 255, 255, 0.04);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      /* full bleed to right edge of safe area */
+      margin-left: -72px;
+      margin-right: -72px;
+      padding-left: 72px;
+      padding-right: 72px;
+    }
+
+    .chevron {
+      font-size: 30px;
+      font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 500;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .cmd-text {
+      font-size: 30px;
+      font-family: 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.75);
+      letter-spacing: 0em;
+    }
+
+    .cmd-text .slash-cmd {
+      color: #41d1aa;
+      font-weight: 500;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 18px;
+      height: 34px;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 2px;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    .tagline {
+      margin-top: 28px;
+      font-size: 34px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.52);
+      line-height: 1.35;
+    }
+
+    /* ── Bottom row ── */
+    .bottom {
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .wordmark {
+      font-size: 26px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.28);
+      letter-spacing: 0.04em;
+    }
+
+    .wordmark span {
+      color: rgba(65, 209, 170, 0.55);
+    }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="glow"></div>
+    <div class="grid"></div>
+
+    <div class="top">
+      <div class="pip"></div>
+      <div class="label">Agent Skill</div>
+    </div>
+
+    <div class="main">
+      <div class="headline">
+        Docs, <span class="anywhere">anywhere.</span>
+      </div>
+      <div class="command">
+        <span class="chevron">›</span>
+        <span class="cmd-text"><span class="slash-cmd">/vitepress</span> serve docs and print the url<span class="cursor"></span></span>
+      </div>
+      <p class="tagline">One command. Live on every device, away from your desk.</p>
+    </div>
+
+    <div class="bottom">
+      <div class="wordmark">Vite<span>Press</span> Skill</div>
+    </div>
+  </div>
+</body>
+</html>
