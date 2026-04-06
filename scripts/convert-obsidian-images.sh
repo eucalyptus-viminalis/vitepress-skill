@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Converts Obsidian image embeds to standard markdown for VitePress compatibility.
 #
 #   ![[image.png]]           → ![image.png](./image.png)
@@ -12,6 +12,8 @@
 #
 # If no directory is given, defaults to the current directory.
 # Skips .vitepress, node_modules, and .git directories.
+
+set -euo pipefail
 
 TARGET_DIR="${1:-.}"
 

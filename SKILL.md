@@ -1,24 +1,40 @@
 ---
 name: vitepress
-description: Set up and configure VitePress documentation sites. Use when creating a docs site, configuring VitePress sidebar/nav, converting Obsidian markdown, or troubleshooting VitePress issues. Triggers on phrases like "set up docs", "vitepress", "documentation site", "add sidebar", "add nav".
+description: Set up, configure, migrate, and troubleshoot VitePress documentation sites. Use when creating a docs site, wiring docs/.vitepress/config.ts, configuring sidebar/nav, converting Obsidian markdown, or fixing VitePress dev/build issues. Triggers on phrases like "vitepress", "docs site", "documentation site", "add sidebar", "add nav", or "obsidian docs".
 ---
 
-# Vitepress Skill
+# VitePress Skill
 
-VitePress is used for serving docs.
+Use this skill when the user wants a VitePress documentation site created, configured, migrated from markdown or Obsidian, or repaired.
+
+## Typical requests
+
+- set up a VitePress docs site
+- add nav or sidebar items in VitePress
+- convert an Obsidian vault into VitePress-friendly docs
+- fix a VitePress dev server or build failure
+
+## Default workflow
+
+1. Keep docs in `docs/` and config in `docs/.vitepress/config.ts`.
+2. Prefer `pnpm` for install and scripts.
+3. Ensure `package.json` includes `"type": "module"` and `docs:dev`, `docs:build`, and `docs:preview` scripts.
+4. If the source markdown comes from Obsidian, copy the bundled script to `scripts/convert-obsidian-images.sh`, make it executable, then run it before building or wire it into `docs:build`.
+5. Keep `themeConfig.nav` and `themeConfig.sidebar` aligned with real files under `docs/`.
+6. Verify with `pnpm docs:build`; use `pnpm docs:dev` for local inspection.
 
 ## Scaffold
 
-When setting up a new VitePress project, create the following structure:
+When bootstrapping a new site, create:
 
-```
+```text
 docs/
 ├── .vitepress/
 │   └── config.ts
-├── public/           # static assets (favicons, etc.)
-├── guide/            # content pages
+├── public/
+├── guide/
 │   └── getting-started.md
-└── index.md          # home page
+└── index.md
 ```
 
 Minimal `docs/.vitepress/config.ts`:
@@ -61,46 +77,49 @@ hero:
 ---
 ```
 
-## Install
+## Install and scripts
 
-prefer `pnpm`
+Prefer:
 
 ```bash
 pnpm add -D vitepress
 ```
 
-## Scripts
-
-- do not use a directory that contains spaces.
-  - this causes issues with shell quoting in npm/pnpm scripts and VitePress path resolution.
-  - ask the user to rename the folder to serve or use symlinking as a last resort
+Use namespaced scripts:
 
 ```json
-  ...
+{
+  "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs --host 0.0.0.0",
     "docs:build": "bash scripts/convert-obsidian-images.sh docs && vitepress build docs",
     "docs:preview": "vitepress preview docs --host 0.0.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
   }
-  ...
+}
 ```
 
-Opens on `http://localhost:5173` and `http://0.0.0.0:5173` (network accessible).
+Notes:
 
-The `docs:build` script runs the Obsidian image converter before building so image syntax is always normalized. Standard markdown images render fine in Obsidian, so this is safe even if the docs directory is an Obsidian vault.
+- do not use a directory path that contains spaces; it causes quoting and path-resolution issues in scripts and VitePress
+- `docs:dev` usually opens on `http://localhost:5173`
+- using `--host 0.0.0.0` lets the docs dev server be reached from other devices on the same local network, which is useful for reviewing docs on a phone or tablet away from the desk while connected over Wi-Fi
+- if `docs:build` references `scripts/convert-obsidian-images.sh`, ensure that file has been copied into the project first
+- `docs:build` can safely run the Obsidian image converter even when the docs already use standard markdown images
 
-## Sidebar & Nav Configuration
+## Nav and sidebar patterns
 
-All navigation is configured in `docs/.vitepress/config.ts` under `themeConfig`.
+All navigation lives in `docs/.vitepress/config.ts` under `themeConfig`.
 
-### Top nav bar
+Top nav example:
 
 ```ts
 themeConfig: {
   nav: [
     { text: 'Home', link: '/' },
     { text: 'Guide', link: '/guide/getting-started' },
-    // dropdown
     {
       text: 'Resources',
       items: [
@@ -112,9 +131,7 @@ themeConfig: {
 }
 ```
 
-### Sidebar
-
-Simple flat sidebar:
+Simple sidebar example:
 
 ```ts
 themeConfig: {
@@ -130,7 +147,7 @@ themeConfig: {
 }
 ```
 
-Per-route sidebars (different sidebar for different sections):
+Per-route sidebar example:
 
 ```ts
 themeConfig: {
@@ -157,42 +174,43 @@ themeConfig: {
 }
 ```
 
-Collapsible sections:
-
-```ts
-{
-  text: 'Advanced',
-  collapsed: true,  // starts collapsed
-  items: [ ... ]
-}
-```
-
 Key rules:
-- sidebar links must match the file path relative to `docs/` (e.g. `docs/guide/foo.md` → `/guide/foo`)
-- sidebar does NOT render on `layout: home` pages — only on `layout: doc` (the default)
-- keep sidebar config in sync with actual files; broken links silently render as empty items
 
-## Gotchas
+- sidebar links must match file paths relative to `docs/` without the `.md` suffix
+- `layout: home` pages do not render the sidebar; `layout: doc` pages do
+- keep config and file structure in sync; broken links often show up as empty items rather than loud failures
 
-### 1. `pnpm docs` opens npmjs.com
+## Obsidian migration
 
-`pnpm docs` is a built-in pnpm command that opens the package's npm page. It does not run the `docs` script in `package.json`. Use namespacing; prefix it with `docs:` e.g. `docs:dev`.
+VitePress does not support Obsidian image embeds like:
 
-### 2. ESM compatibility error
-
-VitePress is ESM-only. Without `"type": "module"` in `package.json`, vite's esbuild fails with:
-
-```
-"vitepress" resolved to an ESM file. ESM file cannot be loaded by `require`.
+```md
+![[image.png]]
 ```
 
-Fix: add `"type": "module"` to `package.json`.
+Use `scripts/convert-obsidian-images.sh` to normalize image syntax before building. It handles:
 
-### 3. esbuild build scripts blocked by pnpm
+- `![[image.png]]` -> `![image.png](./image.png)`
+- `![[image.png|alt text]]` -> `![alt text](./image.png)`
+- `![[subdir/image.png]]` -> `![image.png](./subdir/image.png)`
+- `![[image.png|300]]` -> `![image.png](./image.png)`
+- non-image embeds like `![[note#heading]]` are skipped
 
-pnpm requires explicit approval to run postinstall scripts for dependencies. esbuild needs its postinstall to install the platform-specific binary. Without it, VitePress fails silently or with missing binary errors.
+When the project needs this workflow, copy the bundled script from this skill into the target repo as `scripts/convert-obsidian-images.sh`.
 
-Fix: add to `package.json`:
+## Common gotchas
+
+### `pnpm docs` opens npmjs.com
+
+`pnpm docs` is a built-in pnpm command. Use `docs:dev`, `docs:build`, or `docs:preview` instead.
+
+### ESM error loading VitePress
+
+If VitePress fails because an ESM file cannot be loaded by `require`, add `"type": "module"` to `package.json`.
+
+### esbuild binary missing under pnpm
+
+If VitePress fails because `esbuild` did not install correctly, add:
 
 ```json
 "pnpm": {
@@ -200,24 +218,10 @@ Fix: add to `package.json`:
 }
 ```
 
-### 4. Obsidian image syntax not supported
+### `.vitepress/cache` and `.vitepress/dist` tracked in git
 
-Obsidian uses `![[image.png]]` for image embeds. VitePress only supports standard markdown:
+Add `.vitepress/cache` and `.vitepress/dist` to `.gitignore`. Keep `docs/.vitepress/config.ts` tracked.
 
-```md
-![alt text](./image.png)
-```
+### Home page has no sidebar
 
-The `scripts/convert-obsidian-images.sh` script handles this conversion automatically. It runs as part of `docs:build` (see Scripts section). It also handles:
-- `![[image.png|alt text]]` → `![alt text](./image.png)`
-- `![[subdir/image.png]]` → `![image.png](./subdir/image.png)`
-- `![[image.png|300]]` (Obsidian resize syntax) → stripped, outputs `![image.png](./image.png)`
-- `![[note#heading]]` (Obsidian embeds) → skipped, these are not images
-
-### 5. Gitignore `.vitepress/cache` and `.vitepress/dist`
-
-`.vitepress/cache` and `.vitepress/dist` should be added to `.gitignore`. The config file (`config.ts`) must remain tracked.
-
-### 6. Home page has no sidebar
-
-VitePress's `layout: home` does not render the sidebar. The sidebar only appears on `layout: doc` pages (see Sidebar & Nav Configuration section). Use hero action buttons and the top nav bar for home page navigation.
+That is expected for `layout: home`. Use the top nav and hero actions to guide people into doc pages.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "VitePress Docs"
+  short_description: "Build and fix VitePress documentation sites"
+  default_prompt: "Use $vitepress to set up, configure, or troubleshoot a VitePress docs site."
