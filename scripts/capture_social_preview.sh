@@ -4,7 +4,6 @@ set -euo pipefail
 INPUT_HTML="${1:-assets/social-preview.html}"
 OUTPUT_PNG="${2:-assets/social-preview.png}"
 VIEWPORT="${3:-1200,630}"
-SCALE="${4:-1}"
 
 if [[ ! -f "$INPUT_HTML" ]]; then
   echo "Input HTML not found: $INPUT_HTML" >&2

@@ -34,6 +34,7 @@ Then restart Codex.
 - handles common VitePress gotchas like ESM config and `esbuild` issues
 - includes an Obsidian image conversion helper at `scripts/convert-obsidian-images.sh`
 - encourages `--host 0.0.0.0` for checking docs from another device on the same Wi-Fi network
+- documents copy-to-clipboard buttons, including the VitePress 1.x vs 2.0 config difference, in [references/Copy-to-Clipboard Buttons.md](<references/Copy-to-Clipboard Buttons.md>)
 
 ## Example prompts
 
@@ -72,3 +73,23 @@ Use $vitepress to convert this Obsidian docs folder into VitePress-friendly mark
 ```text
 Use $vitepress to fix why pnpm docs:build is failing.
 ```
+
+## Development
+
+Run the shell syntax checks and the Obsidian converter regression tests:
+
+```bash
+make test
+```
+
+Regenerate the social preview image (requires Chrome; Playwright is invoked through `npx`):
+
+```bash
+make social-preview
+```
+
+The reference guide lives at [references/Copy-to-Clipboard Buttons.md](<references/Copy-to-Clipboard Buttons.md>).
+
+## License
+
+MIT. See [LICENSE](LICENSE).

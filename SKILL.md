@@ -12,6 +12,7 @@ Use this skill when the user wants a VitePress documentation site created, confi
 - set up a VitePress docs site
 - add nav or sidebar items in VitePress
 - convert an Obsidian vault into VitePress-friendly docs
+- add or customize copy-to-clipboard buttons
 - fix a VitePress dev server or build failure
 
 ## Default workflow
@@ -197,6 +198,12 @@ Use `scripts/convert-obsidian-images.sh` to normalize image syntax before buildi
 - non-image embeds like `![[note#heading]]` are skipped
 
 When the project needs this workflow, copy the bundled script from this skill into the target repo as `scripts/convert-obsidian-images.sh`.
+
+## Copy-to-clipboard buttons
+
+The default theme already adds copy buttons to fenced code blocks. For custom tooltip or success text, buttons on non-code content, or a "copy page as Markdown" control, read `references/Copy-to-Clipboard Buttons.md` in this skill.
+
+Keep the versions straight: `markdown.codeCopyButtonTitle` is the VitePress 1.x option; VitePress 2.0 alpha uses `markdown.codeCopyButton: { tooltipText, copiedText }`.
 
 ## Common gotchas
 
